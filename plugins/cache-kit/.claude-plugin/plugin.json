@@ -1,6 +1,6 @@
 {
   "name": "cache-kit",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Prompt-cache hygiene guidance and a local Claude Code cache statusline.",
   "author": {
     "name": "cache-kit contributors"

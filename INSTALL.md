@@ -13,15 +13,15 @@ Follow these instructions when a user says: “install claude-cache-kit from htt
        "type": "command",
        "command": "node <absolute path to>/.claude/cache-kit/statusline.mjs"
      },
-     "autoCompactWindow": 70,
+     "env": { "CLAUDE_AUTOCOMPACT_PCT_OVERRIDE": "70" },
      "promptCacheTtl": "1h"
    }
    ```
 
-   Replace the placeholder with the user's actual absolute home path. Explain that `promptCacheTtl: "1h"` is explicit for API-key users and already matches the main-conversation subscription default; the longer TTL can cost more on short bursts that never idle past five minutes. Do not add or modify `subagentPromptCacheTtl`.
+   Replace the placeholder with the user's actual absolute home path. Explain that `promptCacheTtl: "1h"` is explicit for API-key users and already matches the main-conversation subscription default; the longer TTL can cost more on short bursts that never idle past five minutes. Merge `CLAUDE_AUTOCOMPACT_PCT_OVERRIDE` into any existing `env` object without touching other variables; it makes auto-compaction trigger at 70% of the auto-compact window (it can only lower the threshold). Do not add or modify `subagentPromptCacheTtl`. If the existing settings contain `"autoCompactWindow": 70` (written by cache-kit 0.1.0, which misread that key: it is a token count, so 70 was clamped to 100000 tokens), remove that key in the same diff.
 5. Show the exact JSON diff, including any existing values that will be replaced, and ask the user once whether to apply it. Do not write the merged settings until the user confirms.
 6. After confirmation, write the merged settings and tell the user to restart Claude Code. Explain that the statusline should show `ctx N%` immediately; after the first reply it should also show cache state and hit ratio, and it may show a recent miss cause. When the cache is cold and context is at least 40%, it should say `cache cold: /compact adds no cache cost`.
 
 ## Uninstall
 
-If the user wants to uninstall cache-kit, either restore `~/.claude/settings.json.bak-cache-kit` over `~/.claude/settings.json`, or remove only the three cache-kit keys (`statusLine`, `autoCompactWindow`, and `promptCacheTtl`) while preserving unrelated settings. Then remove the `~/.claude/cache-kit/` folder. Do not remove unrelated Claude configuration.
+If the user wants to uninstall cache-kit, either restore `~/.claude/settings.json.bak-cache-kit` over `~/.claude/settings.json`, or remove only the three cache-kit keys (`statusLine`, `env.CLAUDE_AUTOCOMPACT_PCT_OVERRIDE`, and `promptCacheTtl`) while preserving unrelated settings. Then remove the `~/.claude/cache-kit/` folder. Do not remove unrelated Claude configuration.

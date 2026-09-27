@@ -12,7 +12,7 @@ cache-kit is a Claude Code plugin for prompt-cache hygiene. It provides a local 
 /cache-kit:setup
 ```
 
-The setup command copies the statusline to a stable user path, proposes `statusLine`, `autoCompactWindow: 70`, and `promptCacheTtl: "1h"`, shows the exact diff, and asks once before changing settings.
+The setup command copies the statusline to a stable user path, proposes `statusLine`, `env.CLAUDE_AUTOCOMPACT_PCT_OVERRIDE: "70"`, and `promptCacheTtl: "1h"`, shows the exact diff, and asks once before changing settings.
 
 ## Verify it works
 
@@ -31,9 +31,23 @@ An unchanged request prefix is billed at about one-tenth of the input price. A c
 
 ## What it can't do
 
-Claude Code has no idle- or TTL-triggered compaction setting or hook output. The statusline can tell you when compacting adds no extra cache cost, but compaction still summarises the whole conversation; there is no compact-to-40% control. Setup sets `autoCompactWindow` to 70%, which triggers automatic compaction at 70% context fullness.
+Claude Code has no idle- or TTL-triggered compaction setting or hook output. The statusline can tell you when compacting adds no extra cache cost, but compaction still summarises the whole conversation; there is no compact-to-40% control. Setup sets `CLAUDE_AUTOCOMPACT_PCT_OVERRIDE=70`, which makes automatic compaction trigger at 70% of the auto-compact window instead of the default (it can only lower the threshold). The status line's `ctx %` is measured against the full context window, so it is not the same number as the compaction trigger.
 
-The optional `subagentPromptCacheTtl` setting is not changed by cache-kit. A longer subagent TTL can cost more on short bursts of work that never idle past five minutes. The statusline and settings changes run locally; no data leaves the machine.
+**Fix for 0.1.0 installs:** 0.1.0 wrote `"autoCompactWindow": 70`. That key is a token count (100000–1000000), so 70 was clamped to 100000 tokens and compaction ran far too early. Re-run the install (or `/cache-kit:setup`); it removes the key.
+
+## Subagents and the 1-hour cache
+
+Subagents and workflow agents use a 5-minute cache by default, even on subscriptions (`subagentPromptCacheTtl`). cache-kit leaves that alone on purpose: in a measured 14 days of real sessions, subagents already hit the cache 97% of the time, and 1-hour writes cost 2× base input vs 1.25× for 5-minute ones, so a global 1 h would have cost far more than it saved. Use it per agent instead, for agent types that sit idle more than 5 minutes between requests (long builds, slow tools):
+
+```yaml
+---
+name: my-slow-agent
+experimental:
+  cacheTtl: 1h
+---
+```
+
+Or set `"subagentPromptCacheTtl": "1h"` globally only if your subagents regularly idle past 5 minutes. The statusline and settings changes run locally; no data leaves the machine.
 
 ## License
 

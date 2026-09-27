@@ -11,3 +11,13 @@ Prompt-cache hygiene guidance:
 - When the cache is cold, `/compact` adds no extra cache cost. Prefer it before continuing a large context rather than compacting mid-flow after rebuilding a warm cache.
 - Batch MCP and model changes at session start. After a long idle gap, expect a miss because the cache may have expired.
 - If `ANTHROPIC_BASE_URL` points at a gateway, caching works only when it forwards `cache_control` unchanged. A gateway that strips it can make the whole history uncached on every turn.
+
+Subagents and workflows:
+
+- Subagents do not share the main conversation's cache; only forks inherit it. The first subagent of a given model in a session is a cold write.
+- Workflow siblings share a cached prefix only when model, effort, agent type, tools, output schema and working directory all match. Keep them identical across a fan-out; each variant is its own cold prefix.
+- Workflows already hold matching siblings until the first one's response starts (`CLAUDE_CODE_WORKFLOW_PREFIX_STAGGER_MS`), so do not add manual delays. For many same-config parallel agents, prefer one workflow fan-out over separate Agent-tool spawns.
+- A different working directory or git worktree is a different prefix: worktree-isolated agents never share a cache.
+- Keep the 5-minute subagent cache by default. Give an agent type `experimental: { cacheTtl: 1h }` in its frontmatter only if it idles more than 5 minutes between requests.
+- Markdown handoff files reduce context size, not cache cost. Use them for large or durable outputs.
+- Prefer `/rewind` over `/compact` when abandoning a path; `/rewind` reuses the earlier cached prefix.
