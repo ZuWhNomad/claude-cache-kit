@@ -49,6 +49,10 @@ experimental:
 
 Or set `"subagentPromptCacheTtl": "1h"` globally only if your subagents regularly idle past 5 minutes. The statusline and settings changes run locally; no data leaves the machine.
 
+## See also
+
+Using OpenAI Codex CLI too? [codex-cache-kit](https://github.com/ZuWhNomad/codex-cache-kit) applies the same ideas there.
+
 ## License
 
 MIT. See [LICENSE](LICENSE).
