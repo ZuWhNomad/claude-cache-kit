@@ -1,0 +1,13 @@
+{
+  "name": "cache-kit",
+  "owner": {
+    "name": "cache-kit contributors"
+  },
+  "description": "Prompt-cache hygiene tools for Claude Code.",
+  "plugins": [
+    {
+      "name": "cache-kit",
+      "source": "./plugins/cache-kit"
+    }
+  ]
+}
