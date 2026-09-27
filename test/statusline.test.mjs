@@ -60,14 +60,14 @@ test("cold at 55 percent suggests compacting", () => {
   );
 });
 
-test("warm at 80 percent suggests compacting", () => {
+test("warm at 80 percent has no compact hint", () => {
   assert.equal(
     plain({
       model: { display_name: "Claude" },
       context_window: { used_percentage: 80 },
       prompt_cache: { warm: true, expires_at: now / 1000 + 30, hit_ratio: 1 }
     }),
-    "Claude · ctx 80% · warm 0:30 left · hit 100% · consider /compact"
+    "Claude · ctx 80% · warm 0:30 left · hit 100%"
   );
 });
 

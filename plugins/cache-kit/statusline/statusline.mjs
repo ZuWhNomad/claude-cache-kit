@@ -112,8 +112,6 @@ export function formatStatusLine(data, now = Date.now(), options = {}) {
   const contextValue = finiteNumber(safeData.context_window?.used_percentage);
   if (state.kind === "cold" && contextValue != null && contextValue >= 40) {
     parts.push(colorize("cache cold: /compact adds no cache cost", "90", useColor));
-  } else if (state.kind === "warm" && contextValue != null && contextValue >= 70) {
-    parts.push(colorize("consider /compact", "90", useColor));
   }
 
   return parts.join(" · ");
